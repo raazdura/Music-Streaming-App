@@ -1,0 +1,39 @@
+
+{
+    "album_type": "compilation",  // The type of the album.
+    "total_tracks": 9,            // The number of tracks in the album.
+    "href": "string",             //A link to the Web API endpoint providing full details of the album.
+    "id": "2up3OPMp9Tb4dAKM2erWXQ", //The Spotify ID for the album. Example: "2up3OPMp9Tb4dAKM2erWXQ"
+    "images": [                     //The cover art for the album in various sizes, widest first.
+      {
+        "url": "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228",
+        "height": 300,
+        "width": 300
+      }
+    ],
+    "name": "string",             //The name of the album. In case of an album takedown, the value may be an empty string.
+    "release_date": "1981-12",    //The date the album was first released. Example: "1981-12"
+    "artists": [
+      {
+        "id": "string"        // The ID for the artist.
+      }
+    ],
+    "tracks": {
+      "total": 4,
+      "items":[
+        {
+          "id": "string"        // The ID for the artist.
+        }
+      ],
+    },
+  }
+
+
+  artist
+  {
+  "genres": ["Prog rock", "Grunge"], // A list of the genres the artist is associated with. If not yet classified, the array is empty.
+  "href": "string", // A link to the Web API endpoint providing full details of the artist.
+  "id": "string", // ID for the artist.
+  "imagesPath": "string"
+  "name": "string", // The name of the artist.
+}

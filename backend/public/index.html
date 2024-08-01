@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Song Player</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .song {
+            margin-bottom: 20px;
+        }
+        .cover-art {
+            width: 100px;
+            height: 100px;
+        }
+        .title {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Song Player</h1>
+    <div id="songs"></div>
+
+    <script>
+        // Function to fetch and display songs
+        async function fetchSongs() {
+            const response = await fetch('/api/songs', {
+                headers: {
+                    'Authorization': 'Bearer your-token-here'
+                }
+            });
+            const data = await response.json();
+            const songs = data.songs;
+            const songsContainer = document.getElementById('songs');
+
+            songs.forEach(song => {
+                const songElement = document.createElement('div');
+                songElement.className = 'song';
+
+                const coverArt = document.createElement('img');
+                coverArt.src = song.coverArt;
+                coverArt.alt = `${song.title} cover art`;
+                coverArt.className = 'cover-art';
+
+                const title = document.createElement('div');
+                title.className = 'title';
+                title.textContent = song.title;
+
+                const subtitle = document.createElement('div');
+                subtitle.textContent = song.subtitle;
+
+                const artists = document.createElement('div');
+                artists.textContent = 'Artists: ' + song.artists.map(artist => artist.name).join(', ');
+
+                const playButton = document.createElement('button');
+                playButton.textContent = 'Play';
+                playButton.onclick = () => playSong(song.streamUrl);
+
+                songElement.appendChild(coverArt);
+                songElement.appendChild(title);
+                songElement.appendChild(subtitle);
+                songElement.appendChild(artists);
+                songElement.appendChild(playButton);
+
+                songsContainer.appendChild(songElement);
+            });
+        }
+
+        // Function to play a song
+        function playSong(url) {
+            const audioPlayer = document.getElementById('audio-player');
+            audioPlayer.src = url;
+            audioPlayer.style.display = 'block';
+            audioPlayer.play();
+        }
+
+        // Fetch songs on page load
+        window.onload = fetchSongs;
+    </script>
+
+    <!-- Hidden audio player -->
+    <audio id="audio-player" controls style="display:none;"></audio>
+</body>
+</html>
