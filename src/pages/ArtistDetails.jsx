@@ -7,10 +7,12 @@ import { useGetArtistDetailsQuery } from '../redux/services/musicCore';
 
 const ArtistDetails = () => {
   const { id: artistId } = useParams();
+  console.log(artistId);
   const { activeSong, isPlaying } = useSelector((state) => state.player);
   const { data: artistData, isFetching: isFetchingArtistDetails, error } = useGetArtistDetailsQuery(artistId);
 
   console.log(artistData);
+  // console.log(artistData.name);
 
   if (isFetchingArtistDetails) return <Loader title="Loading artist details..." />;
 
@@ -24,6 +26,7 @@ const ArtistDetails = () => {
       />
 
       <RelatedSongs
+        // data={artistData?.data.views['top-songs']?.data}
         data={artistData?.tracks}
         artistId={artistId}
         isPlaying={isPlaying}

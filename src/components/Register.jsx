@@ -1,13 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { IoMdNotificationsOutline } from "react-icons/io";
 import Boudha from '../assets/Bouddha.jpg';
 
+import { useSelector } from 'react-redux';
+
+
 const Register = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
+
+  const { isAuthenticated, user } = useSelector((state) => state.user);
+  // console.log(isAuthenticated);
+  // console.log("token: " + token);
+  // console.log("user: " + user);
+
 
   const handleNavigate = (path) => {
     navigate(path);
@@ -24,17 +33,22 @@ const Register = () => {
   };
 
   useEffect(() => {
+    const token = localStorage.getItem("userToken");
+
+    if(token) setIsLoggedIn(true)
+    else setIsLoggedIn(false)
+
     // Add event listener to detect clicks outside the dropdown
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       // Cleanup the event listener on component unmount
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [isLoggedIn]);
 
   return (
     <>
-      {isLoggedIn ? (
+      { isAuthenticated ? (
         <div id='loggedIn' className='flex flex-row items-center'>
           <IoMdNotificationsOutline 
             className='w-10 h-10 p-2 mr-2 text-white hover:bg-black rounded-full'
@@ -53,7 +67,8 @@ const Register = () => {
               >
                 <a href="/profile" className='block px-2 py-2 text-white hover:bg-gray-600 rounded'>Profile</a>
                 <a href="/settings" className='block px-2 py-2 text-white hover:bg-gray-600 rounded'>Settings</a>
-                <a href="/logout" className='block px-2 py-2 text-white hover:bg-gray-600 rounded'>Logout</a>
+                {/* <a href="/logout" className='block px-2 py-2 text-white hover:bg-gray-600 rounded'>Logout</a> */}
+                <Link to={'/logout'} className='block px-2 py-2 text-white hover:bg-gray-600 rounded' >Logout</Link>
               </div>
             )}
           </div>

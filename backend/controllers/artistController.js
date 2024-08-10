@@ -1,4 +1,6 @@
 const Artist = require("../models/artistsModel");
+const Song = require("../models/songModel")
+const Album = require("../models/albumModel")
 const mongoose = require("mongoose");
 const path = require('path');
 const multer = require('multer');
@@ -80,8 +82,28 @@ const getArtist = async (req, res) => {
       return res.status(404).json({ error: "No such Artist" });
     }
 
-    res.status(200).json(artist);
+    const songs = await Song.find({ _id: { $in: artist.tracks } });
+
+    if (!songs) {
+      return res.status(404).json({ error: "Error while fetching Songs" });
+    }
+
+    const albums = await Album.find({ _id: { $in: artist.albums } });
+
+    if (!albums) {
+      return res.status(404).json({ error: "Error while fetching Songs" });
+    }
+
+
+    const artistDetails = {
+      ...artist.toObject(),
+      albums: albums,
+      tracks: songs
+    };
+
+    res.status(200).json(artistDetails);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "An error occurred while fetching the Artist" });
   }
 };

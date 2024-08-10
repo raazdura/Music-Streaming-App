@@ -1,13 +1,28 @@
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Route, Routes, useLocation } from 'react-router-dom';
 
 import { Searchbar, Sidebar, MusicPlayer, TopPlay } from './components';
-import { ArtistDetails, TopArtists, AroundYou, Discover, Search, SongDetails, TopCharts, Artists } from './pages';
+import { ArtistDetails, TopArtists, Discover, Search, SongDetails, TopCharts, Artists } from './pages';
 import Register from './components/Register';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Logout from './pages/Logout';
+
+import { setUser } from './redux/features/userSlice';
 
 const App = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const token = localStorage.getItem('userToken');
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    if (token && user) {
+      dispatch(setUser({ user, token }));
+    }
+  }, [dispatch]);
+
   const { activeSong } = useSelector((state) => state.player);
   const location = useLocation();
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
@@ -17,7 +32,7 @@ const App = () => {
       {!isAuthPage && <Sidebar />}
       <div className="flex-1 flex flex-col bg-gradient-to-br from-black to-[#121286] w-full">
         {!isAuthPage && (
-          <div className='flex justify-between px-6'>
+          <div className='flex justify-between px-6 mr-10 md:mr-0'>
             <Searchbar />
             <Register />
           </div>
@@ -29,12 +44,12 @@ const App = () => {
               <Route path="/" element={<Discover />} />
               <Route path="/top-artists" element={<TopArtists />} />
               <Route path="/top-charts" element={<TopCharts />} />
-              <Route path="/around-you" element={<AroundYou />} />
               <Route path="/artists/:id" element={<ArtistDetails />} />
               <Route path="/songs/:songid" element={<SongDetails />} />
               <Route path="/search/:searchTerm" element={<Search />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/logout" element={<Logout />} />
             </Routes>
           </div>
           {!isAuthPage && (

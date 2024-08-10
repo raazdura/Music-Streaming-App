@@ -1,11 +1,20 @@
 import React from "react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+
+import { setUser } from '../redux/features/userSlice';
+import { useDispatch } from "react-redux";
+
 
 const Login = () => {
+  const dispatch = useDispatch();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  const navigate = useNavigate();
 
   const loginHandler = async (e) => {
     e.preventDefault();
@@ -16,22 +25,29 @@ const Login = () => {
       },
     };
 
-    // try {
-    //   const { data } = await axios.post(
-    //     "/api/auth/login",
-    //     { email, password },
-    //     config
-    //   );
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/auth/login",
+        { email, password },
+        config
+      );
+      const { user, token } = response.data;
 
-    //   localStorage.setItem("authToken", data.token);
+      dispatch(setUser({ user, token }));
 
-    //   // history.push("/");
-    // } catch (error) {
-    //   setError(error.response.data.error);
-    //   setTimeout(() => {
-    //     setError("");
-    //   }, 5000);
-    // }
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("userToken", token);
+
+      navigate('/');
+
+      // history.push("/");
+    } catch (error) {
+      // setError(error.response.data.error);
+      // setTimeout(() => {
+      //   setError("");
+      // }, 5000);
+      console.log(error);
+    }
   };
 
   return (

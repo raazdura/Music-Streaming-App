@@ -32,7 +32,9 @@ const login = async (req, res, next) => {
     if (!user) {
       return next(new ErrorResponse("Invalid Credentials", 401))
     }
-console.log(user);
+
+    console.log(user);
+
     const inMatch = await user.matchPassword(password);
 
     if (!inMatch) {
@@ -40,6 +42,7 @@ console.log(user);
     }
 
     sendToken(user, 201, res);
+
   } catch (error) {
     res.status(500).json({ success: false, error: error.message});
   }
@@ -123,5 +126,5 @@ module.exports = {
 
 const sendToken = (user, statusCode, res) => {
   const token = user.getSignedToken();
-  res.status(statusCode).json({ success: true, token });
+  res.status(statusCode).json({ success: true, user, token });
 }

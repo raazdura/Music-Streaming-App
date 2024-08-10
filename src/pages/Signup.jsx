@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Signup = () => {
   const [username, setUsername] = useState("");
@@ -7,6 +8,8 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [confirmpassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+
+  const navigate = useNavigate();
 
   const registerHandler = async (e) => {
     e.preventDefault();
@@ -26,25 +29,29 @@ const Signup = () => {
       return setError("Passwords do not match");
     }
 
-    // try {
-    //   const { data } = await axios.post(
-    //     "/api/auth/register",
-    //     {
-    //       username,
-    //       email,
-    //       password,
-    //     },
-    //     config
-    //   );
+    try {
+      const { data } = await axios.post(
+        "http://localhost:4000/api/auth/register",
+        {
+          username,
+          email,
+          password,
+        },
+        config
+      );
 
-    //   localStorage.setItem("authToken", data.token);
-    // } catch (error) {
-    //   setError(error);
-    //   console.log(error);
-    //   setTimeout(() => {
-    //     setError("");
-    //   }, 5000);
-    // }
+      localStorage.setItem("authToken", data.token);
+
+      navigate('/');
+
+    } catch (error) {
+      console.log(error);
+      // setError(error);
+      // console.log(error);
+      // setTimeout(() => {
+      //   setError("");
+      // }, 5000);
+    }
   };
 
   return (

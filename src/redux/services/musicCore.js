@@ -7,6 +7,7 @@ export const musicCoreApi = createApi({
   }),
   endpoints: (builder) => ({
     getTopCharts: builder.query({ query: () => 'songs' }),
+    getTopArtists: builder.query({ query: () => 'artists' }),
     getSongsByGenre: builder.query({ query: (genre) => `v1/charts/genre-world?genre_code=${genre}` }),
     getSongsByCountry: builder.query({ query: (countryCode) => `v1/charts/country?country_code=${countryCode}` }),
     getSongsBySearch: builder.query({ query: (searchTerm) => `v1/search/multi?search_type=SONGS_ARTISTS&query=${searchTerm}` }),
@@ -18,6 +19,7 @@ export const musicCoreApi = createApi({
 
 export const {
   useGetTopChartsQuery,
+  useGetTopArtistsQuery,
   useGetSongsByGenreQuery,
   useGetSongsByCountryQuery,
   useGetSongsBySearchQuery,

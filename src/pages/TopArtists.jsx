@@ -1,10 +1,10 @@
 import React from 'react';
 
 import { ArtistCard, Error, Loader } from '../components';
-import { useGetTopChartsQuery } from '../redux/services/musicCore';
+import { useGetTopArtistsQuery } from '../redux/services/musicCore';
 
 const TopArtists = () => {
-  const { data, isFetching, error } = useGetTopChartsQuery();
+  const { data, isFetching, error } = useGetTopArtistsQuery();
 
   if (isFetching) return <Loader title="Loading artists..." />;
 
@@ -15,7 +15,7 @@ const TopArtists = () => {
       <h2 className="font-bold text-3xl text-white text-left mt-4 mb-10">Top artists</h2>
 
       <div className="flex flex-wrap sm:justify-start justify-center gap-8">
-        {data?.map((track) => <ArtistCard key={track._id} track={track} />)}
+        {data?.map((artist) => <ArtistCard key={artist._id} artist={artist} />)}
       </div>
     </div>
   );

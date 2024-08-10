@@ -23,7 +23,7 @@ const TopChartCard = ({ song, i, isPlaying, activeSong, handlePauseClick, handle
             {song?.title}
           </p>
         </Link>
-        <Link to={`/artists/${song?.artists[0]}`}>
+        <Link to={`/artists/${song?.artists[0]?._id}`}>
           <p className="text-sm text-gray-300 mt-1">
             {song.artists[0].name}
           </p>
@@ -51,7 +51,7 @@ const TopPlay = () => {
   });
 
   const topPlays = data?.slice(0, 5);
-  console.log(topPlays);
+  // console.log(topPlays);
 
   const handlePauseClick = () => {
     dispatch(playPause(false));
@@ -75,7 +75,7 @@ const TopPlay = () => {
         <div className="mt-4 flex flex-col gap-1">
           {topPlays?.map((song, i) => (
             <TopChartCard
-              key={song.key}
+              key={song.key || i}
               song={song}
               i={i}
               isPlaying={isPlaying}
@@ -110,7 +110,7 @@ const TopPlay = () => {
               style={{ width: '18%', height: 'auto' }}
               className="shadow-lg rounded-full animate-slideright"
             >
-              <Link to={`/artists/${artist?.artists[0]}`}>
+              <Link to={`/artists/${artist?.artists[0]?._id}`}>
                 <img src={`http://localhost:4000/api/${artist?.artists[0]?.imagepath}`} alt="Name" className="rounded-full w-full object-cover" />
               </Link>
             </SwiperSlide>

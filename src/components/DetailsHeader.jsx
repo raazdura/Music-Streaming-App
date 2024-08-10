@@ -13,16 +13,17 @@ const DetailsHeader = ({ artistId, artistData, songData }) => (
         //     .replace('{w}', '500')
         //     .replace('{h}', '500')
         //     : songData?.images?.coverart
-        src={
-          artistId ? `http://localhost:4000/api/${artistData?.imagepath}`
-            : songData?.coverart
-}
+        // src={
+        //   artistId ? `/api/public/images/artists/1720449174782-Daniel Caesar.jpg`
+        //     : songData?.coverart
+        // }
+        src={`http://localhost:4000/api/${artistData?.imagepath}`}
         className="sm:w-48 w-28 sm:h-48 h-28 rounded-full object-cover border-2 shadow-xl shadow-black"
       />
 
       <div className="ml-5">
         <p className="font-bold sm:text-3xl text-xl text-white">
-          {artistId ? artistData?.name: songData?.title}
+          {artistId ? artistData?.name : songData?.title}
         </p>
         {!artistId && (
           <Link to={`/artists/${songData?.artists[0]}`}>
