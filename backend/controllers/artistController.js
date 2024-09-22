@@ -1,4 +1,5 @@
 const Artist = require("../models/artistsModel");
+const User = require("../models/User");
 const Song = require("../models/songModel")
 const Album = require("../models/albumModel")
 const mongoose = require("mongoose");
@@ -154,11 +155,40 @@ const updateArtist = async (req, res) => {
   }
 };
 
+const followArtist = async (req, res) => {
+  const { userid, artistId } = req.body;
+
+  try {
+    // Logic to add the follow relationship in the database
+    // For example, you could use Mongoose to find the user and update their followed artists
+    const user = await User.findById(userid);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const artist = await Artist.findById(artistId);
+    if (!user) {
+      return res.status(404).json({ message: 'Artist not found' });
+    }
+
+    // Assuming you have a "followedArtists" field in your user model
+    user.followedArtists.push(artistId);
+    await user.save();
+
+    artist.followersCount += 1; // Increment the follower count
+    await artist.save();
+
+    res.status(200).json({ message: 'Artist followed successfully', user });
+  } catch (error) {
+    res.status(500).json({ message: 'Error following artist', error });
+  }
+}
+
 module.exports = {
   createArtist,
   getArtists,
   getArtist,
   deleteArtist,
   updateArtist,
+  followArtist,
   upload
 };

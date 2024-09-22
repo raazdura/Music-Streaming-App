@@ -5,6 +5,7 @@ const {
     getArtist,
     deleteArtist,
     updateArtist,
+    followArtist,
     upload
 } = require('../controllers/artistController');
 
@@ -28,5 +29,8 @@ router.delete('/:id', deleteArtist);
 
 // UPDATE a song
 router.patch('/:id', updateArtist);
+
+//Follow artist
+router.post('/artists/follow', followArtist);
 
 module.exports = router;

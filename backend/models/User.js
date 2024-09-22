@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const mongoose = require('mongoose');
+const Playlist = require("../models/playlistModel");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -23,6 +24,8 @@ const UserSchema = new mongoose.Schema({
         minlength: 6,
         select: false
     },
+    playlists: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Playlist' }],
+    followedArtists: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Artist' }],
     resetPasswordToken: String,
     resetPasswordExpire: Date
 });

@@ -2,13 +2,13 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Error, Loader, SongCard } from "../components";
-import { selectGenreListId } from "../redux/features/playerSlice";
 import { useGetTopChartsQuery } from "../redux/services/musicCore";
-import { genres } from "../assets/constants";
+// import { selectGenreListId } from "../redux/features/playerSlice";
+// import { genres } from "../assets/constants";
 
 const Discover = () => {
-  const dispatch = useDispatch();
-  const { genreListId } = useSelector((state) => state.player);
+  // const dispatch = useDispatch();
+  // const { genreListId } = useSelector((state) => state.player);
   const { activeSong, isPlaying } = useSelector((state) => state.player);
   const { data, isFetching, error } = useGetTopChartsQuery();
 

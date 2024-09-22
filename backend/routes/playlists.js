@@ -21,9 +21,7 @@ router.get('/', getPlaylists);
 router.get('/:id', getPlaylist);
 
 //POST a new song
-router.post('/:user_id/playlists',  upload.fields([
-    { name: 'coverart', maxCount: 1 }
-]), createPlaylist);
+router.post('/create', createPlaylist);
 
 // DELETE a song
 router.delete('/:id', deletePlaylist);

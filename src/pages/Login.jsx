@@ -32,6 +32,7 @@ const Login = () => {
         config
       );
       const { user, token } = response.data;
+      console.log(response);
 
       dispatch(setUser({ user, token }));
 

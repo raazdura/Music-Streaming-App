@@ -1,5 +1,7 @@
+const mongoose = require("mongoose");
 const crypto = require('crypto');
 const User = require("../models/User");
+const Song = require("../models/songModel");
 const ErrorResponse = require('../utils/errorResponse');
 const sendEmail = require('../utils/sendEmail');
 
@@ -23,30 +25,72 @@ const login = async (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return next(new ErrorResponse("Please provide an email and password", 400))
+    return next(new ErrorResponse("Please provide an email and password", 400));
   }
 
   try {
-    const user = await User.findOne({ email }).select("+password");
+    // Find user by email and include password and id in the result
+    const userfound = await User.findOne({ email }).select("+password +_id");
 
-    if (!user) {
-      return next(new ErrorResponse("Invalid Credentials", 401))
+    if (!userfound) {
+      return next(new ErrorResponse("Invalid Credentials", 401));
     }
 
-    console.log(user);
+    // Match provided password with stored password
+    const isMatch = await userfound.matchPassword(password);
 
-    const inMatch = await user.matchPassword(password);
-
-    if (!inMatch) {
-      return next(new ErrorResponse("Invalid Credentials", 401))
+    if (!isMatch) {
+      return next(new ErrorResponse("Invalid Credentials", 401));
     }
 
+    // Populate user's playlists with track details
+    const user = await User.findById(userfound._id)
+      .populate({
+        path: 'playlists',
+        model: 'Playlist', // Referencing the Playlist model
+        populate: {
+          path: 'tracks.id', // Populating the tracks in each playlist
+          model: 'Song', // Referencing the Music model
+        },
+      });
+
+    // Send token and user details
     sendToken(user, 201, res);
 
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message});
+    console.log(error);
+    res.status(500).json({ success: false, error: error.message });
   }
 };
+
+const getUserDetails = async (req, res, next) => {
+  const { id } = req.params;
+  console.log(id);
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ error: "No such Artist" });
+  }
+
+  try {
+
+    // Populate user's playlists with track details
+    const userdetails = await User.findById(userfound._id)
+      .populate({
+        path: 'playlists',
+        model: 'Playlist', // Referencing the Playlist model
+        populate: {
+          path: 'tracks.id', // Populating the tracks in each playlist
+          model: 'Song', // Referencing the Music model
+        },
+      });
+
+    res.status(200).json(userdetails);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "An error occurred while fetching the User Details" });
+  }
+
+}
 
 const forgotpassword = async (req, res, next) => {
   const { email } = req.body;
@@ -122,6 +166,7 @@ module.exports = {
   login,
   forgotpassword,
   resetpassword,
+  getUserDetails,
 };
 
 const sendToken = (user, statusCode, res) => {

@@ -10,7 +10,7 @@ const Logout = () => {
     useEffect(() => {
         dispatch(logout());
         localStorage.removeItem("user");
-        localStorage.removeItem("authToken");
+        localStorage.removeItem("userToken");
         navigate('/');
     });
 

@@ -24,7 +24,6 @@ const ArtistDetails = () => {
         artistId={artistId}
         artistData={artistData}
       />
-
       <RelatedSongs
         // data={artistData?.data.views['top-songs']?.data}
         data={artistData?.tracks}

@@ -10,14 +10,26 @@ import Signup from './pages/Signup';
 import Logout from './pages/Logout';
 
 import { setUser } from './redux/features/userSlice';
+import PlaylistDetails from './pages/PlaylistDetails';
+import Profile from './pages/Profile';
+
+import { useGetUserQuery } from './redux/services/musicCore';
 
 const App = () => {
   const dispatch = useDispatch();
 
+  // const token = localStorage.getItem('userToken');
+  // const usersaved = JSON.parse(localStorage.getItem('user'));
+  
+  // if (token && usersaved) {
+  //   const { user, token } = useGetUserQuery(usersaved?._id);
+  //   dispatch(setUser({ user, token }));
+  // }
+
   useEffect(() => {
     const token = localStorage.getItem('userToken');
     const user = JSON.parse(localStorage.getItem('user'));
-
+  
     if (token && user) {
       dispatch(setUser({ user, token }));
     }
@@ -38,7 +50,7 @@ const App = () => {
           </div>
         )}
 
-        <div className={`${!isAuthPage ? 'px-6 h-[calc(100vh-72px)]' : 'h-screen'} overflow-y-scroll hide-scrollbar flex xl:flex-row flex-col-reverse`}>
+        <div className={`${!isAuthPage ? 'px-4 h-[calc(100vh-72px)]' : 'h-screen'} overflow-y-scroll hide-scrollbar flex xl:flex-row flex-col-reverse`}>
           <div className={`flex-1 h-fit ${!isAuthPage && 'pb-40'}`}>
             <Routes>
               <Route path="/" element={<Discover />} />
@@ -46,7 +58,9 @@ const App = () => {
               <Route path="/top-charts" element={<TopCharts />} />
               <Route path="/artists/:id" element={<ArtistDetails />} />
               <Route path="/songs/:songid" element={<SongDetails />} />
+              <Route path="/playlist/:id" element={<PlaylistDetails />} />
               <Route path="/search/:searchTerm" element={<Search />} />
+              <Route path="/user/profile" element={<Profile />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/logout" element={<Logout />} />
