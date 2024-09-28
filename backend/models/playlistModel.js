@@ -9,10 +9,11 @@ const PlaylistSchema = new Schema({
   coverart: { type: String },
   followers: { type: Number, default: 0 },
   tracks: [
-    {
-      id: { type: mongoose.Schema.Types.ObjectId, ref: 'Music' },
-      position: { type: Number, required: true }
-    }
+    // {
+      // id: 
+      { type: mongoose.Schema.Types.ObjectId, ref: 'Song' },
+      // position: { type: Number, required: true }
+    // }
   ]
 });
 

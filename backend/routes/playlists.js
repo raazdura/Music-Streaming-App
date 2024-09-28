@@ -5,6 +5,9 @@ const {
     getPlaylist,
     deletePlaylist,
     updatePlaylist,
+    deleteAll,
+    addSong,
+    removeSong,
     upload
 } = require('../controllers/playlistController');
 
@@ -23,13 +26,20 @@ router.get('/:id', getPlaylist);
 //POST a new song
 router.post('/create', createPlaylist);
 
-// DELETE a song
-router.delete('/:id', deletePlaylist);
+router.patch('/update/:playlistId', upload.single('coverImage'), updatePlaylist);
 
-// UPDATE a playlist details
-router.patch('/:id', updatePlaylist);
+// DELETE a song
+router.delete('/delete', deletePlaylist);
+
+router.patch('/addSong', addSong);
+
+router.patch('/removeSong', removeSong);
+
+router.patch('/update', updatePlaylist);
 
 //update playlist items
 router.patch('/:id/track', updatePlaylist);
+
+router.get('/deleteall', deleteAll);
 
 module.exports = router;

@@ -77,30 +77,19 @@ const getArtist = async (req, res) => {
   }
 
   try {
-    const artist = await Artist.findById(id);
-
-    if (!artist) {
-      return res.status(404).json({ error: "No such Artist" });
-    }
-
-    const songs = await Song.find({ _id: { $in: artist.tracks } });
-
-    if (!songs) {
-      return res.status(404).json({ error: "Error while fetching Songs" });
-    }
-
-    const albums = await Album.find({ _id: { $in: artist.albums } });
-
-    if (!albums) {
-      return res.status(404).json({ error: "Error while fetching Songs" });
-    }
-
-
-    const artistDetails = {
-      ...artist.toObject(),
-      albums: albums,
-      tracks: songs
-    };
+    const artistDetails = await Artist.findById(id)
+      .populate({
+        path: 'albums',
+        model: 'Album',
+      })
+      .populate({
+        path: 'tracks',
+        model: 'Song',
+        populate: {
+          path: 'album',
+          model: 'Album',
+        },
+      });
 
     res.status(200).json(artistDetails);
   } catch (error) {

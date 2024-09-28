@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const crypto = require('crypto');
 const User = require("../models/User");
-const Song = require("../models/songModel");
+const Artist = require("../models/artistsModel");
 const ErrorResponse = require('../utils/errorResponse');
 const sendEmail = require('../utils/sendEmail');
 
@@ -47,10 +47,10 @@ const login = async (req, res, next) => {
     const user = await User.findById(userfound._id)
       .populate({
         path: 'playlists',
-        model: 'Playlist', // Referencing the Playlist model
+        model: 'Playlist',
         populate: {
-          path: 'tracks.id', // Populating the tracks in each playlist
-          model: 'Song', // Referencing the Music model
+          path: 'tracks',
+          model: 'Song',
         },
       });
 
@@ -65,32 +65,40 @@ const login = async (req, res, next) => {
 
 const getUserDetails = async (req, res, next) => {
   const { id } = req.params;
-  console.log(id);
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).json({ error: "No such Artist" });
+    return res.status(404).json({ error: "No such user" });
   }
 
   try {
-
-    // Populate user's playlists with track details
-    const userdetails = await User.findById(userfound._id)
+    // Populate user's playlists with track details and followers
+    const userDetails = await User.findById(id)
       .populate({
         path: 'playlists',
-        model: 'Playlist', // Referencing the Playlist model
+        model: 'Playlist',
         populate: {
-          path: 'tracks.id', // Populating the tracks in each playlist
-          model: 'Song', // Referencing the Music model
+          path: 'tracks',
+          model: 'Song',
         },
+      })
+      .populate({
+        path: 'followings',
+        model: 'Artist',
       });
 
-    res.status(200).json(userdetails);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "An error occurred while fetching the User Details" });
-  }
+    if (!userDetails) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
-}
+    console.log(userDetails);
+
+    res.status(200).json(userDetails);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: "An error occurred while fetching the user details" });
+  }
+};
+
 
 const forgotpassword = async (req, res, next) => {
   const { email } = req.body;
@@ -161,12 +169,76 @@ const resetpassword = async  (req, res, next) => {
   }
 };
 
+// Follow an artist
+const followArtist = async (req, res) => {
+  const { artistid, userid } = req.body;
+  console.log(artistid);
+  console.log(userid);
+
+  try {
+    const user = await User.findById(userid);
+    const artist = await Artist.findById(artistid);
+
+    if (!user || !artist) {
+      return res.status(404).json({ message: 'User or Artist not found' });
+    }
+
+    if (user.followings.includes(artistid)) {
+      return res.status(400).json({ message: 'You are already following this artist' });
+    }
+
+    user.followings.push(artistid);
+    // artist.followers.push(userid);    
+
+    await user.save();
+    // await artist.save();
+
+    res.status(200).json({ message: 'Artist followed successfully' });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+// Unfollow an artist
+const unfollowArtist = async (req, res) => {
+  const { artistid, userid } = req.body;
+  console.log(artistid);
+  console.log(userid);
+
+  try {
+    const user = await User.findById(userid);
+    const artist = await Artist.findById(artistid);
+
+    if (!user || !artist) {
+      return res.status(404).json({ message: 'User or Artist not found' });
+    }
+
+    if (!user.followings.includes(artistid)) {
+      return res.status(400).json({ message: 'You are not following this artist' });
+    }
+
+    user.followings = user.followings.filter(id => id.toString() !== artistid);
+    // artist.followers = artist.followers.filter(id => id.toString() !== userid);
+
+    await user.save();
+    // await artist.save();
+
+    res.status(200).json({ message: 'Artist unfollowed successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+
 module.exports = {
   register,
   login,
   forgotpassword,
   resetpassword,
   getUserDetails,
+  followArtist,
+  unfollowArtist
 };
 
 const sendToken = (user, statusCode, res) => {

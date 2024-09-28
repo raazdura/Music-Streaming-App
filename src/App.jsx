@@ -18,14 +18,6 @@ import { useGetUserQuery } from './redux/services/musicCore';
 const App = () => {
   const dispatch = useDispatch();
 
-  // const token = localStorage.getItem('userToken');
-  // const usersaved = JSON.parse(localStorage.getItem('user'));
-  
-  // if (token && usersaved) {
-  //   const { user, token } = useGetUserQuery(usersaved?._id);
-  //   dispatch(setUser({ user, token }));
-  // }
-
   useEffect(() => {
     const token = localStorage.getItem('userToken');
     const user = JSON.parse(localStorage.getItem('user'));

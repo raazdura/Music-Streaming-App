@@ -1,67 +1,81 @@
 import React, { useState } from 'react';
+import { MdOutlineLibraryMusic } from "react-icons/md";
+import { FiPlus } from "react-icons/fi";
 import { NavLink } from 'react-router-dom';
-import { HiOutlineHashtag, HiOutlineHome, HiOutlineMenu, HiOutlineUserGroup } from 'react-icons/hi';
-import { RiCloseLine } from 'react-icons/ri';
+import { useSelector } from 'react-redux';
+import { useGetUserQuery, useCreatePlaylistMutation } from '../redux/services/musicCore';
+import CoverArt from '../assets/love-logo-654.png';
 
-const playlists = [
-  { name: 'Playlist 01', to: '/', icon: HiOutlineHome },
-  { name: 'Playlist 02', to: '/top-artists', icon: HiOutlineUserGroup },
-  { name: 'Playlist 03', to: '/top-charts', icon: HiOutlineHashtag },
-];
-
-
-const NavLinks = ({ handleClick }) => (
-  <div className="mt-10">
-    {playlists.map((item) => (
-      <NavLink
-        key={item.name}
-        to={item.to}
-        end
-        className={({ isActive }) =>
-          isActive
-            ? 'flex flex-row justify-start items-center my-8 text-sm font-medium text-cyan-400'
-            : 'flex flex-row justify-start items-center my-8 text-sm font-medium text-gray-400 hover:text-cyan-400'
-        }
-        onClick={() => handleClick && handleClick()}
-      >
-        <item.icon className="w-6 h-6 mr-2" />
-        {item.name}
-      </NavLink>
-    ))}
-  </div>
-);
+import PlaylistLinks from "./PlaylistLinks";
+import FollowingArtistsLinks from "./FollowingArtistsLinks";
+import { Button } from '@mui/material';
 
 const YourLibrary = () => {
-//   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  const [libraryOption, setLibraryOption] = useState("playlists");
+
+  const { user, isAuthenticated } = useSelector((state) => state.user);
+
+  const [createPlaylist, { isLoading, isSuccess, error }] = useCreatePlaylistMutation();
+
+  // Fetch user data to update the playlist state
+  const { data: updatedUser, refetch } = useGetUserQuery({ userid: user?._id,  skip: !user?._id });
+  console.log(updatedUser?.playlists)
+
+  const handleCreatePlaylist = async () => {
+    if (!user?._id) {
+      console.error('User ID is undefined. Cannot create playlist.');
+      return;
+    }
+
+    try {
+      const response = await createPlaylist({
+        songid: `${updatedUser?.playlists.length + 1}`,
+        userid: `${updatedUser._id}`,
+      });
+
+      console.log('Playlist created:', response);
+
+      refetch();
+    } catch (err) {
+      console.error('Error creating playlist:', err);
+    }
+  };
 
   return (
-    <>
-      <div className="md:flex hidden flex-col w-[200px] py-8 px-4 bg-[#191624]">
-        {/* <img src={logo} alt="logo" className="w-full h-14 object-contain" /> */}
-        {/* <a href='/'>
-            <h1 className="text-white font-bold text-3xl text-center p-2 m-2 ">
-                Music <br/>
-                <p className="text-sm">Streaming App</p>
-            </h1>
-        </a> */}
-        <NavLinks />
+    <div className="">
+      <div className="text-white font-bold text-xl flex items-center justify-between border-t-2 border-zinc-500">
+        <h1 className="flex items-center text-xl my-4  ">
+          <MdOutlineLibraryMusic className="mr-2 text-3xl" />
+          Your Library
+        </h1>
+        <div className="p-2 hover:bg-slate-700 rounded-full cursor-pointer" onClick={handleCreatePlaylist}>
+          <FiPlus />
+        </div>
       </div>
-
-      {/* Mobile sidebar */}
-      {/* <div className="absolute md:hidden block top-5 right-3">
-        {!mobileMenuOpen ? (
-          <HiOutlineMenu className="w-7 h-7 mr-2 text-white" onClick={() => setMobileMenuOpen(true)} />
-        ) : (
-          <RiCloseLine className="w-7 h-7 mr-2 text-white" onClick={() => setMobileMenuOpen(false)} />
-        )}
-      </div> */}
-
-      {/* <div className={`absolute top-0 h-screen w-2/4 bg-gradient-to-tl from-white/10 to-[#483D8B] 
-        backdrop-blur-lg z-10 p-6 md:hidden smooth-transition ${mobileMenuOpen ? 'left-0' : '-left-full'}`}>
-        <img src={logo} alt="logo" className="w-full h-14 object-contain" />
-        <NavLinks handleClick={() => setMobileMenuOpen(false)} />
-      </div> */}
-    </>
+      <div className="flex font-semibold text-sm text-center p-2">
+        <span
+          className={`px-4 py-2 mr-2 border-white border-2 rounded-full cursor-default ${libraryOption === 'playlists' ? 'bg-white text-black' : 'text-white'}`}
+          onClick={() => setLibraryOption('playlists')}
+        >
+          Playlists
+        </span>
+        <span
+          className={`px-4 py-2 border-white border-2 rounded-full cursor-default ${libraryOption === 'artists' ? 'bg-white text-black' : 'text-white'}`}
+          onClick={() => setLibraryOption('artists')}
+        >
+          Artists
+        </span>
+      </div>
+      {isAuthenticated ?
+        libraryOption === 'playlists' ? <PlaylistLinks /> : <FollowingArtistsLinks />
+      : (
+        <div className="text-white text-2xl">
+          log in to view your playlists
+        </div>
+      )
+      }
+    </div>
   );
 };
 

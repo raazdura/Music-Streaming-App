@@ -40,7 +40,10 @@ const Signup = () => {
         config
       );
 
-      localStorage.setItem("authToken", data.token);
+      console.log(data);
+
+      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("userToken", data.token);
 
       navigate('/');
 

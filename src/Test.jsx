@@ -3,10 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import CoverArt from '../assets/love-logo-654.png';
 import Profile from '../assets/profile.png';
-import EditPlaylistDetails from '../components/EditPlaylistDetails';
 
 import PlaylistSongCard from '../components/PlaylistSongCard';
 import { Error, Loader } from "../components";
+
+
 import PlayPause from "../components/PlayPause";
 import { playPause, setActiveSong, } from '../redux/features/playerSlice';
 
@@ -27,12 +28,12 @@ const PlaylistDetails = () => {
   const { id: playlistId } = useParams();
   const { activeSong, isPlaying } = useSelector((state) => state.player);
   const { data: playlistData, isFetching: isFetchingPlaylistDetails, error, refetch: refetchPlaylistDetails } = useGetPlaylistDetailsQuery(playlistId);
-
+  // console.log(playlistData);
+  
   const navigate = useNavigate();
   const [deletePlaylist] = useDeletePlaylistMutation();
 
   const menuRef = useRef(null);
-  const editMenuRef = useRef(null);  // Reference for the edit menu modal
   const [showMenu, setShowMenu] = useState(false);
   const [editMenu, setEditMenu] = useState(false);
 
@@ -42,27 +43,22 @@ const PlaylistDetails = () => {
 
   const toggleEditMenu = () => {
     setEditMenu(!editMenu);
-  };
+  }
 
   const handleClickOutside = (event) => {
-    // Close the dropdown menu if clicked outside
     if (menuRef.current && !menuRef.current.contains(event.target)) {
       setShowMenu(false);
-    }
-    // Close the edit modal if clicked outside
-    if (editMenu && editMenuRef.current && !editMenuRef.current.contains(event.target)) {
-      setEditMenu(false);
     }
   };
 
   useEffect(() => {
-    // Add event listener to detect clicks outside the dropdown or modal
+    // Add event listener to detect clicks outside the dropdown
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       // Cleanup the event listener on component unmount
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [editMenu]);
+  }, []);
 
   const handleDelete = async () => {
     await deletePlaylist({ playlistid: playlistId });
@@ -78,9 +74,14 @@ const PlaylistDetails = () => {
       <div className="relative w-full">
         <div className="flex items-end pb-6">
           <div className="relative group">
+            <div className="absolute inset-0 flex-col justify-center items-center text-white 
+              bg-black bg-opacity-50 hidden group-hover:flex" >
+                <FiEdit2 size={42} />
+                <span>Choose photo</span>
+            </div>
             <img
               className="sm:w-48 w-28 sm:h-48 h-28 rounded-md object-cover shadow-l shadow-black"
-              src={playlistData.coverart ? `http://localhost:4000/api/${playlistData.coverart}` : CoverArt}
+              src={CoverArt}
               alt="playlist cover"
             />
           </div>
@@ -150,20 +151,12 @@ const PlaylistDetails = () => {
               i={i}
               isPlaying={isPlaying}
               activeSong={activeSong}
-              playlistData={playlistData}
-              refetchPlaylistDetails={refetchPlaylistDetails}
+              playlistData = {playlistData}
+              refetchPlaylistDetails = {refetchPlaylistDetails}
             />
           ))}
         </div>
       </div>
-
-      {/* Modal for Editing Playlist Details */}
-      {editMenu && (
-        <EditPlaylistDetails
-          setEditMenu={setEditMenu}
-          playlistData={playlistData  }
-        />
-      )}
     </div>
   );
 };

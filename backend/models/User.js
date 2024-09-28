@@ -1,65 +1,64 @@
-const crypto = require('crypto');
-const mongoose = require('mongoose');
-const Playlist = require("../models/playlistModel");
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const crypto = require("crypto");
+const mongoose = require("mongoose");
+// const Song = require("../models/songModel");
+// const Playlist = require("../models/playlistModel");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { type } = require("os");
 
 const UserSchema = new mongoose.Schema({
-    username: {
-        type: String,
-        required: [true, "Please provide username"]
-    },
-    email: {
-        type: String,
-        required: [true, "Please provide email"],
-        unique: true,
-        match: [
-            /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-            "Please provide a valid email"
-        ]
-    },
-    password: {
-        type: String,
-        required: [true, "Please add a password"],
-        minlength: 6,
-        select: false
-    },
-    playlists: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Playlist' }],
-    followedArtists: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Artist' }],
-    resetPasswordToken: String,
-    resetPasswordExpire: Date
+  username: { type: String, required: [true, "Please provide username"], },
+  email: { type: String, required: [true, "Please provide email"], unique: true,
+    match: [
+      /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+      "Please provide a valid email",
+    ],
+  },
+  password: { type: String, required: [true, "Please add a password"], minlength: 6,
+    select: false,
+  },
+  photo: { type: Boolean },
+  isArtist: { type: Boolean , default: false },
+  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  followings: [{ type: mongoose.Schema.Types.ObjectId, ref: "Artist" }],
+  liked: [{ type: mongoose.Schema.Types.ObjectId, ref: "Song" }],
+  playlists: [{ type: mongoose.Schema.Types.ObjectId, ref: "Playlist" }],
+  resetPasswordToken: String,
+  resetPasswordExpire: Date,
 });
 
-UserSchema.pre("save", async function(next) {
-    if (!this.isModified("password")) {
-        next();
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    console.log(this.password);
+UserSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
     next();
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  console.log(this.password);
+  next();
 });
 
 UserSchema.methods.matchPassword = async function (password) {
-    return await bcrypt.compare(password, this.password);
+  return await bcrypt.compare(password, this.password);
 };
 
-UserSchema.methods.getSignedToken = function() {
-    return jwt.sign({ id: this._id }, 
-        process.env.JWT_SECRET, 
-        {expiresIn: process.env.JWT_EXPIRE,}
-    );
+UserSchema.methods.getSignedToken = function () {
+  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRE,
+  });
 };
 
-UserSchema.methods.getResetPasswordToken = async function() {
-    const resetToken = crypto.randomBytes(20).toString("hex");
+UserSchema.methods.getResetPasswordToken = async function () {
+  const resetToken = crypto.randomBytes(20).toString("hex");
 
-    this.resetPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+  this.resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
 
-    this.resetPasswordExpire = Date.now() + 10 * (60 * 1000);
-    return resetToken;
-}
+  this.resetPasswordExpire = Date.now() + 10 * (60 * 1000);
+  return resetToken;
+};
 
 const User = mongoose.model("User", UserSchema);
 

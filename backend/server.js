@@ -31,7 +31,7 @@ app.use((req, res, next) => {
 // workouts routes
 app.use("/api/songs", songRoutes);
 app.use("/api/albums", albumRoutes);
-app.use("/api/artists", artistRoutes);
+app.use("/api/artists", artistRoutes); 
 app.use("/api/playlists", playlistRoutes);
 
 app.use("/api/auth", require("./routes/auth"));
@@ -64,6 +64,27 @@ app.get('/api/public/images/songs/:imageName', (req, res) => {
 app.get('/api/public/images/artists/:imageName', (req, res) => {
   const imageName = req.params.imageName;
   const imagePath = path.join(__dirname, 'public/images/artists', imageName);
+
+  console.log(imageName);
+  console.log(imagePath);
+
+  fs.access(imagePath, fs.constants.F_OK, (err) => {
+    if (err) {
+      return res.status(404).send('Image not found');
+    }
+
+    res.sendFile(imagePath, (err) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+      }
+    });
+  });
+});
+
+app.get('/api/public/images/playlists/:imageName', (req, res) => {
+  const imageName = req.params.imageName;
+  const imagePath = path.join(__dirname, 'public/images/playlists', imageName);
 
   console.log(imageName);
   console.log(imagePath);
